@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>STZA Field Visit Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F7F6; --sheet:#FFFFFF; --ink:#16233A; --ink-2:#4A5568; --rule:#D9DEE3; --field:#EEF1F3;
+  --ok:#2E7D4F; --ok-bg:#E3F2E8; --minor:#9A6212; --minor-bg:#FBF0DA; --major:#B3261E; --major-bg:#FBE4E1;
+  --na:#6B7280; --na-bg:#ECEEF0; --focus:#2563EB; --brand:#0F5132;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0F1520; --sheet:#172030; --ink:#E6EAF0; --ink-2:#A3AEBF; --rule:#2A3547; --field:#1E2939;
+  --ok:#5CC08A; --ok-bg:#16301F; --minor:#E0A645; --minor-bg:#33270F; --major:#F2786E; --major-bg:#3A1714;
+  --na:#9AA3AF; --na-bg:#232C3A; --focus:#7AA7FF; --brand:#5CC08A; }}
+:root[data-theme="dark"]{
+  --paper:#0F1520; --sheet:#172030; --ink:#E6EAF0; --ink-2:#A3AEBF; --rule:#2A3547; --field:#1E2939;
+  --ok:#5CC08A; --ok-bg:#16301F; --minor:#E0A645; --minor-bg:#33270F; --major:#F2786E; --major-bg:#3A1714;
+  --na:#9AA3AF; --na-bg:#232C3A; --focus:#7AA7FF; --brand:#5CC08A; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 80px}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--ink);padding-bottom:12px}
+header.top h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.01em;line-height:1.1}
+header.top p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
+.store{font-size:13px;color:var(--ink-2)}
+nav.tabs{display:flex;gap:4px;margin:16px 0 20px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);z-index:5;padding:8px 0;border-bottom:1px solid var(--rule)}
+nav.tabs button{border:0;background:none;padding:8px 14px;border-radius:6px;font-weight:600;color:var(--ink-2);cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--ink-2)}
+label.f input,label.f select,label.f textarea{background:var(--field);border:1px solid var(--rule);border-radius:6px;padding:9px 10px;font-weight:400;font-size:15px;color:var(--ink);width:100%}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:var(--field);padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px;color:var(--ink-2)}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"].t{background:var(--ink);color:var(--paper)}
+.lic-info{margin-top:10px;font-size:14px;color:var(--ink-2);min-height:21px}
+.lic-info b{color:var(--ink)}
+h2{font-size:18px;margin:26px 0 10px;font-weight:700}
+h3.sec{font-size:14px;font-weight:700;margin:0;padding:12px 16px;background:var(--field);border-bottom:1px solid var(--rule)}
+.checklist{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.item{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:start;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.item:last-child{border-bottom:0}
+.item .id{font-weight:700;color:var(--ink-2);font-size:13px;padding-top:2px}
+.item .txt{font-size:15px}
+.item .meta{font-size:12px;color:var(--ink-2);margin-top:3px}
+.cls{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:6px}
+.cls.Major{background:var(--major-bg);color:var(--major)} .cls.Minor{background:var(--minor-bg);color:var(--minor)}
+.ans button[aria-pressed="true"][data-v="C"]{background:var(--ok);color:#fff}
+.ans button[aria-pressed="true"][data-v="NC"]{background:var(--major);color:#fff}
+.ans button[aria-pressed="true"][data-v="NA"]{background:var(--na);color:#fff}
+.item.nc{background:var(--major-bg)}
+.note{grid-column:2 / 4}
+.note textarea{width:100%;min-height:54px;background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:8px;font-size:14px}
+.verdict{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);margin-top:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;box-shadow:0 6px 24px rgba(15,21,32,.14)}
+.stamp{font-weight:800;font-size:15px;letter-spacing:.02em;padding:8px 14px;border:3px solid currentColor;border-radius:6px;transform:rotate(-2deg);white-space:nowrap}
+.stamp.major{color:var(--major);background:var(--major-bg)} .stamp.minor{color:var(--minor);background:var(--minor-bg)}
+.stamp.ok{color:var(--ok);background:var(--ok-bg)} .stamp.inc{color:var(--na);background:var(--na-bg);transform:none;border-style:dashed}
+.stamp.pop{animation:pop .28s ease-out}
+@keyframes pop{0%{transform:rotate(-2deg) scale(1.18)}100%{transform:rotate(-2deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.stamp.pop{animation:none}}
+.vtext{flex:1;min-width:200px;font-size:14px;color:var(--ink-2)}
+.vtext b{color:var(--ink)}
+.btn{border:0;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;background:var(--ink);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.btn.danger{background:transparent;color:var(--major);border:1px solid var(--major)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 90px);transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.toast.show{opacity:1}
+.tbl{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:12px;font-weight:700;color:var(--ink-2);background:var(--field);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tbody tr.click{cursor:pointer} tbody tr.click:hover{background:var(--field)}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.major,.pill.red{background:var(--major-bg);color:var(--major)} .pill.minor,.pill.amber{background:var(--minor-bg);color:var(--minor)}
+.pill.ok,.pill.green{background:var(--ok-bg);color:var(--ok)} .pill.inc,.pill.grey{background:var(--na-bg);color:var(--na)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--sheet);border:1px solid var(--rule);border-left:5px solid var(--rule);border-radius:8px;padding:12px 14px}
+.kpi .n{font-size:28px;font-weight:800;line-height:1}
+.kpi .l{font-size:13px;color:var(--ink-2);margin-top:4px}
+.kpi.red{border-left-color:var(--major)} .kpi.amber{border-left-color:var(--minor)} .kpi.green{border-left-color:var(--ok)} .kpi.grey{border-left-color:var(--na)}
+.empty{padding:28px;text-align:center;color:var(--ink-2)}
+.muted{color:var(--ink-2);font-size:13px}
+.legend{font-size:13px;color:var(--ink-2);margin:10px 0 0}
+[hidden]{display:none!important}
+@media (max-width:560px){
+  .item{grid-template-columns:1fr;gap:8px}.item .id{padding:0}.note{grid-column:1}
+  header.top h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Field visit register</h1>
+      <p>Record site visits to Zone Enterprises and Zone Developers and see whether each visit shows a contravention.</p>
+    </div>
+    <div class="store" id="storeState">Connecting…</div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="new" id="tabNew">New visit</button>
+    <button role="tab" aria-selected="false" data-tab="visits">Visits</button>
+    <button role="tab" aria-selected="false" data-tab="board">Scoreboard</button>
+  </nav>
+
+  <!-- NEW VISIT -->
+  <section id="p-new">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:14px">
+        <div class="seg" role="group" aria-label="Licensee type">
+          <button class="t" data-type="ZE" aria-pressed="true">Zone Enterprise</button>
+          <button class="t" data-type="ZD" aria-pressed="false">Zone Developer</button>
+        </div>
+        <span class="muted" id="editBadge" hidden>Editing a saved visit</span>
+      </div>
+      <div class="grid">
+        <label class="f" style="grid-column:1/-1">Licensee (type a name or license number)
+          <input id="licInput" list="licList" autocomplete="off" placeholder="e.g. 3 POL or 01-10015-104">
+          <datalist id="licList"></datalist>
+        </label>
+        <label class="f">Visit date<input type="date" id="vDate"></label>
+        <label class="f">Visited by<input id="vOfficer" placeholder="Officer name(s)"></label>
+        <label class="f">Follow-up action
+          <select id="vAction">
+            <option>None required</option><option>Cure period granted</option><option>Show-cause issued</option>
+            <option>Referred to Approvals Committee</option><option>Order passed</option><option>Closed – remedied</option>
+          </select>
+        </label>
+        <label class="f">Cure deadline (if any)<input type="date" id="vCure"></label>
+      </div>
+      <div class="lic-info" id="licInfo"></div>
+    </div>
+
+    <div id="checklist"></div>
+
+    <label class="f" style="margin-top:16px">General observations
+      <textarea id="vObs" rows="3" placeholder="Anything else seen on site"></textarea>
+    </label>
+
+    <div class="verdict" aria-live="polite">
+      <span class="stamp inc" id="stamp">Not started</span>
+      <span class="vtext" id="vtext">Mark each item Compliant, Non-compliant or N/A.</span>
+      <div class="row">
+        <button class="btn ghost" id="btnReset">Clear form</button>
+        <button class="btn" id="btnSave">Save visit</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISITS -->
+  <section id="p-visits" hidden>
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <label class="f" style="flex:1;min-width:220px">Search<input id="vSearch" placeholder="Licensee, license no, zone or officer"></label>
+      <button class="btn ghost" id="btnCsv" hidden>Download visits (CSV)</button>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Date</th><th>Licensee</th><th>Type</th><th>Result</th><th>Breached items</th><th>Action</th><th>Visited by</th></tr></thead>
+      <tbody id="visitRows"></tbody>
+    </table></div>
+    <p class="legend">Select a visit to open and edit it.</p>
+  </section>
+
+  <!-- SCOREBOARD -->
+  <section id="p-board" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="row" style="margin-bottom:12px">
+      <div class="seg" role="group" aria-label="Filter type" id="boardType">
+        <button class="t" data-f="ALL" aria-pressed="true">All</button>
+        <button class="t" data-f="ZE" aria-pressed="false">ZE</button>
+        <button class="t" data-f="ZD" aria-pressed="false">ZD</button>
+      </div>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px;font-weight:500">
+        <input type="checkbox" id="showUnvisited"> Show licensees not yet visited
+      </label>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Licensee</th><th>Type</th><th>Zone</th><th>Last visit</th><th>Last result</th><th>Visits (12M)</th><th>Minor NCs (12M)</th><th>Major NCs (12M)</th><th>Compliance %</th><th>Status</th></tr></thead>
+      <tbody id="boardRows"></tbody>
+    </table></div>
+    <p class="legend">Red: any Major non-compliance, or 3+ Minor non-compliances in the last 12 months (Schedule B 2.1(a)(i)). Amber: 1–2 Minor. Green: visited, no contravention. Codes and fines follow Schedule B of the STZA M&amp;E Regulations 2026.</p>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const LICENSEES = [{"t": "ZE", "l": "01-10015-104", "n": "3 POL (Pvt) Ltd", "z": "PAF-IAST, Haripur", "c": "Electronic"}, {"t": "ZE", "l": "01-10019-105", "n": "Abhi (Pvt) Ltd", "z": "NASTP Silicon Valley, Karachi", "c": "Fin Tech, IT & ITeS"}, {"t": "ZE", "l": "01-B-10003-101", "n": "Adal Fintech (Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "FinTech"}, {"t": "ZE", "l": "01-10016-105", "n": "AKS iQ (Pvt) Ltd", "z": "NASTP Silicon Valley, Karachi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-B-10013-102", "n": "Aql Tech Solutions (Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "Semiconductor Design&Software Development"}, {"t": "ZE", "l": "01-10000-104", "n": "Ashrei Tech (Pvt) Ltd", "z": "NASTP Sierra, Karachi", "c": "AI, IT & ITeS Big Data Analytics, & Technology Skill Development Cente"}, {"t": "ZE", "l": "01-10024-105", "n": "Avanza Premier Payment Services (Pvt) Ltd", "z": "NASTP Silicon Valley, Karachi", "c": "Fin Tech"}, {"t": "ZE", "l": "01-D-10000-103", "n": "Baykar Technologies (Pvt) Ltd", "z": "NASTP ALPHA, Rawalpindi", "c": "Research , Design & Development of Products in Robotics and AI"}, {"t": "ZE", "l": "01-10021-104", "n": "Bioniks Technologies (Pvt) Ltd", "z": "NASTP Silicon, Karachi", "c": "Biotech"}, {"t": "ZE", "l": "01-10001-106", "n": "BiTech Pvt Ltd", "z": "Innovista Rawal STZ, Rawalpindi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10023-104", "n": "Blue Peaks Consulting (SMC Pvt) Ltd", "z": "NASTP ALPHA, Rawalpindi", "c": "Technology Skill Development Centers"}, {"t": "ZE", "l": "01-10007-104", "n": "Book Me Tickets (SMC Pvt) Ltd", "z": "NASTP Delta, Lahore", "c": "E-Commerce"}, {"t": "ZE", "l": "01-10009-105", "n": "ConnecTech (Pvt) Ltd", "z": "i) NASTP Silicon, Karachi\nii) NASTP Alpha, Rawalpindi", "c": "R&D in Biotech, Agritech, Fine Chemicals, Precise Instruments & Electronics"}, {"t": "ZE", "l": "01-B-10006-101", "n": "ConnectX (SMC Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "BPO"}, {"t": "ZE", "l": "01-10018-104", "n": "Crypttech Pakistan (Pvt) Ltd", "z": "NASTP ALPHA, Rawalpindi", "c": "IT&ITeS & Artificial Intelligence"}, {"t": "ZE", "l": "01-10000-105", "n": "Crystal System Solution (SMC-Pvt) Ltd", "z": "Pakistan Maritime Science & Technology Park, Karachi", "c": "IT, ITeS & Artificial Intelligence"}, {"t": "ZE", "l": "01-10002-105", "n": "CyMax Technologies (Pvt) Ltd", "z": "NUST Special Technology Zone, Islamabad", "c": "IT &  ITeS"}, {"t": "ZE", "l": "01-10021-105", "n": "Dataquartz Partners", "z": "NUST STZ, Islamabad", "c": "IT, ITeS & Artificial Intelligence"}, {"t": "ZE", "l": "01-B-10004-101", "n": "Digi Khata (Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "FinTech"}, {"t": "ZE", "l": "01-B-10014-102", "n": "Digirocx (Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "Data Center, IT.ITeS&Trg Services"}, {"t": "ZE", "l": "01-10003-104", "n": "Dinco Pakistan (Private) Limited", "z": "NASTP Delta, Lahore", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10012-104", "n": "Dynasys Networks (Pvt) Ltd", "z": "i) NASTP Alpha, Rawalpindi \nii) NASTP Silicon, Karachi", "c": "Internet of Things (IoT)"}, {"t": "ZE", "l": "01-D-10003-102", "n": "Dyntek Engineering (Pvt) Ltd", "z": "NASTP ALPHA, Rawalpindi", "c": "Research, Design & Development in Electronics & Major S&T Industrial Domains"}, {"t": "ZE", "l": "01-10013-104", "n": "Edufi Financial Services(Pvt) Ltd", "z": "NASTP Delta, Lahore", "c": "FinTech, EdTech & E-Commerce"}, {"t": "ZE", "l": "01-10007-105", "n": "Elev8Minds", "z": "NUST STZ, Islamabad", "c": "AI, IT, ITeS"}, {"t": "ZE", "l": "01-10002-104", "n": "Emerging Software (Private) Limited", "z": "NASTP Sierra, Karachi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10027-105", "n": "EnablifyAI (Private) Limited", "z": "NASTP Alpha, Rawalpindi", "c": "Artificial Intelligence"}, {"t": "ZE", "l": "01-10004-104", "n": "EPL (Private) Limited", "z": "i) NASTP Delta, Lahore\nii) NASTP Sierra, Karachi", "c": "IT, ITeS & E-Commerce"}, {"t": "ZE", "l": "01-10005-105", "n": "Ferotek (Pvt) Ltd", "z": "Mindbridge STZ, Lahore", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10020-105", "n": "Fetch Sky (AOP)", "z": "NASTP Silicon Valley, Karachi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10025-105", "n": "Future Technologies (Pvt) Limited", "z": "NASTP Silicon Valley, Karachi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10010-105", "n": "GICOH Technologies", "z": "NASTP Delta, Lahore", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-B-10012-102", "n": "Global Message Services Pakistan (Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "Software as a Service"}, {"t": "ZE", "l": "01-10003-106", "n": "GreenLife Technologies (Private) Ltd", "z": "Qarshi Knowledge Park, Lahore", "c": "Agri-Tech, Biotech and Genomics, Fine Chemicals, Nanotech"}, {"t": "ZE", "l": "01-A/D/E-10002-103", "n": "GWAlpha Tech (Pvt) Ltd", "z": "i)  NASTP Sierra, Karachi\nii) NASTP Delta, Lahore\niii) NASTP Alpha, Rawalpindi\niv) NASTP Kamra, Kamra\nv) NASTP Silicon Valley, Karachi", "c": "Robotics, Electronics & IT"}, {"t": "ZE", "l": "01-10006-104", "n": "Harobanx Industries (Private) Limited", "z": "Khanpur Industrial Project, Haripur", "c": "Precise Instruments, Electronics & Fine Chemicals"}, {"t": "ZE", "l": "01-10020-104", "n": "Higgs Computing (Pvt) Ltd", "z": "PAF-IAST, Haripur", "c": "Data centre for High Performace Computing (Computations in Artificial Intelligence, Blockchain, Big Data Analytics, and Cloud Computing"}, {"t": "ZE", "l": "01-10018-105", "n": "HS Technologies (Pvt) Ltd", "z": "NASTP Delta, Lahore", "c": "IT & ITeS, Big Data Analytics"}, {"t": "ZE", "l": "01-10004-106", "n": "HSDY Technologies Pvt Ltd", "z": "Capital Smart Technology Zone (Silicon Village), Rawalpindi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-B-10001-101", "n": "iEngineering (Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "Engineering Software and Big Data Analytics"}, {"t": "ZE", "l": "01-10015-105", "n": "Jarvis Technologies (Pvt) Ltd", "z": "i) NASTP Alpha, Rawalpindi\nii) NASTP Kamra, Kamra", "c": "Robotics & Electronics"}, {"t": "ZE", "l": "01-10019-104", "n": "JaXeri Automotive (Pvt) Ltd", "z": "NASTP Silicon, Karachi", "c": "Electric Vehicles"}, {"t": "ZE", "l": "01-D/E-10001-103", "n": "Khazana Enterprize (Pvt) Ltd", "z": "i) NASTP Alpha, Rawalpindi  \nii) NASTP Delta, Lahore", "c": "Cloud Computing, IT & ITeS"}, {"t": "ZE", "l": "01-10026-104", "n": "Laam (Pvt) Ltd", "z": "NASTP Delta, Lahore", "c": "Ecommerce, IT & ITeS"}, {"t": "ZE", "l": "01-10002-106", "n": "Land Information and Management System (Pvt) Ltd", "z": "Innovista Rawal STZ, Rawalpindi", "c": "IT & ITeS & AgriTech"}, {"t": "ZE", "l": "01-10008-104", "n": "Laser & Electro Optical Solutions (Pvt) Ltd", "z": "1. NASTP ALPHA Rawalpindi\n2. LEOS Technology Zone, Islamabad", "c": "Electronic & Artificial Intelligence"}, {"t": "ZE", "l": "01-10000-106", "n": "Leo Fusion Dynamics (Pvt) Ltd", "z": "NUST STZ, Islamabad", "c": "Robotics"}, {"t": "ZE", "l": "01-B-10009-102", "n": "LogiServe (Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "Technology, R&D, Software, Fintech"}, {"t": "ZE", "l": "01-10029-105", "n": "Margalla Heavy Industries Limited", "z": "NUST Special Technology Zone, Islamabad", "c": "IT & ITeS, Electronics, Robotics, Precise Instruments, Augmented Reality / \nVirtual Reality (AR / VR), AgriTech"}, {"t": "ZE", "l": "01-10034-105", "n": "MedIQ (SMC-Pvt) Ltd", "z": "NASTP Alpha, Rawalpindi", "c": "Telemedicine and IT & ITeS"}, {"t": "ZE", "l": "01-10017-104", "n": "Medsenso (Pvt) Ltd", "z": "NUST Special Technology Zone, Islamabad", "c": "Medical Devices, Fine Chemicals"}, {"t": "ZE", "l": "01-10004-105", "n": "Mega Motor Company Pvt Ltd", "z": "BYD NEV Production Zone, Gharro Sindh", "c": "EV"}, {"t": "ZE", "l": "01-10017-102", "n": "Mindbridge (Private) Limited", "z": "Mindbridge Special Technology Zone, Lahore", "c": "ITeS"}, {"t": "ZE", "l": "01-10028-105", "n": "Mindbridge Services (Private) Limited", "z": "Mindbridge STZ, Lahore", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10006-106", "n": "Nerd Flow Pvt Ltd", "z": "NASTP Alpha, Rawalpindi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10032-105", "n": "Nutrielevate (SMC-Private) Ltd", "z": "Agri-Tech Park, Faisalabad", "c": "BioTech"}, {"t": "ZE", "l": "01-10026-105", "n": "Octa Tech Engineering & Services (Smc) Pvt Ltd.", "z": "NASTP Alpha, Rawalpindi", "c": "Electronics"}, {"t": "ZE", "l": "01-10008-105", "n": "Octathorn (Pvt) Ltd", "z": "NASTP ALPHA, Rawalpindi", "c": "Electronics, IT, ITeS"}, {"t": "ZE", "l": "01-10022-104", "n": "Office Automation Services", "z": "NASTP Silicon, Karachi", "c": "IT, ITeS & Artificial Intelligence"}, {"t": "ZE", "l": "01-10014-105", "n": "Omnify (Private) Limited", "z": "Pakistan Maritime Science & Technology Park, Karachi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10024-104", "n": "Paramount Spectrum", "z": "Capital Smart Technology Zone, Rawalpindi", "c": "ITeS"}, {"t": "ZE", "l": "01-10011-105", "n": "Pavenautics (Pvt) Ltd", "z": "Khanpur Industrial Project, Haripur", "c": "Robotics"}, {"t": "ZE", "l": "01-10009-104", "n": "Paysa FTDP (Pvt) Ltd", "z": "NASTP Delta, Lahore", "c": "FinTech"}, {"t": "ZE", "l": "01-10027-104", "n": "Quality Vertex Integrated System Engineering (QVISE) (Pvt) Ltd", "z": "NASTP Alpha, Rawalpindi", "c": "IT & ITeS, Electronics & Internet of Things (IoT)"}, {"t": "ZE", "l": "01-10012-105", "n": "Quintech Centre of Applied Sciences (Pvt) Ltd", "z": "NASTP Delta, Lahore", "c": "R&D in Biotech & Fine Chemicals"}, {"t": "ZE", "l": "01-B-10000-101", "n": "Rapidev(Pvt) Ltd", "z": "PAF-IAST, Haripur", "c": "Technology Hardware and Software"}, {"t": "ZE", "l": "01-10005-106", "n": "RedSecLabs Pvt Ltd", "z": "Innovista Rawal Technology Zone", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10016-104", "n": "Rhombus (Pvt) Ltd", "z": "NASTP Delta, Lahore", "c": "IT&ITeS and Internet of Things"}, {"t": "ZE", "l": "01-D-10002-102", "n": "Safe Solutions Consultants (Pvt) Ltd", "z": "NASTP ALPHA, Rawalpindi", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-A-10000-103", "n": "Salesflo (Pvt) Ltd", "z": "NASTP Sierra, Karachi", "c": "AI, Cloud Computing, IT & ITeS"}, {"t": "ZE", "l": "01-10006-105", "n": "Sapphire Electronics (Pvt) Ltd", "z": "Sapphire Electronics Production Zone, Kasur", "c": "Electronics"}, {"t": "ZE", "l": "01-10001-104", "n": "Shispare (Private) Limited", "z": "NASTP Delta, Lahore", "c": "Artificial Intelligence, IT, ITeS & Technology Skill Development Centers"}, {"t": "ZE", "l": "01-10003-105", "n": "Sky47 Limited", "z": "Capital Smart Technology Zone, Rawalpindi", "c": "Data Center & Cloud Computing"}, {"t": "ZE", "l": "01-10033-105", "n": "Smart TechOne Pvt Ltd", "z": "Capital Smart Technology Zone, Rawalpindi", "c": "IT & ITeS, Internet of Things (IoT)"}, {"t": "ZE", "l": "01-B-10002-101", "n": "Softech Business Services (SMC Pvt) Ltd", "z": "New State Life Tower, Islamabad", "c": "IT Solutions"}, {"t": "ZE", "l": "01-10025-104", "n": "Solunox (Pvt) Ltd", "z": "NASTP Kamra, Kamra", "c": ""}, {"t": "ZE", "l": "01-10008-106", "n": "Spectrum Scope (Private) Limited", "z": "NASTP Alpha, Rawalpindi\n2. PSEB IT Park, Islamabad", "c": "Electronics"}, {"t": "ZE", "l": "01-10007-106", "n": "Stewart Pakistan Pvt Ltd", "z": "NASTP Delta, Lahore", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-10016-102", "n": "Stingray Technologies (Pvt) Ltd", "z": "i) NASTP Sierra, Karachi\nii) NASTP Alpha, Rawalpindi\niii) PMSTP, Karachi", "c": "AI, Cloud Computing, Electronics & IT"}, {"t": "ZE", "l": "01-10023-105", "n": "Strategy & Knowledge Hub Global (Pvt) Ltd", "z": "NASTP Delta, Lahore", "c": "AR / VR, IT & ITeS"}, {"t": "ZE", "l": "01-10014-104", "n": "Swift Biz Solutions (Pvt) Ltd", "z": "PAF-IAST, Haripur", "c": "Smart Phone & Electronic"}, {"t": "ZE", "l": "01-10013-105", "n": "Systems Limited", "z": "Systems Limited, Lahore", "c": "IT, ITeS, AI, Machine Learning, Cloud Computing"}, {"t": "ZE", "l": "01-10010-104", "n": "Tapsys Services (Pvt) Ltd", "z": "PMSTP, Karachi", "c": "FinTech"}, {"t": "ZE", "l": "01-10022-105", "n": "Techbay (SMC-Pvt) Ltd", "z": "NASTP Silicon Valley, Karachi", "c": "7"}, {"t": "ZE", "l": "01-10005-104", "n": "TenPearls (Private) Limited", "z": "NASTP Sierra, Karachi", "c": "Artificial Intelligence, Machine Learning, Big Data Analytics & IT"}, {"t": "ZE", "l": "01-F-10000-102", "n": "The National Radio Telecommunication Corporation Pvt Ltd (NRTC)", "z": "NRTC Special Technology Zone, Haripur", "c": "R&D, Operations & Developer in AI, IT, Electronics, Big Data Analytics & Robotics"}, {"t": "ZE", "l": "01-10031-105", "n": "The Software Factory (Pvt) Ltd", "z": "NASTP Alpha, Rawalpindi", "c": "IT & ITeS, Big Data Analytics"}, {"t": "ZE", "l": "01-10017-105", "n": "Vita Durare (Pvt) Ltd", "z": "Capital Smart Technology Zone, Rawalpindi", "c": "Biomedical Technology and Biotech & Genomics"}, {"t": "ZE", "l": "01-10011-104", "n": "Wemsol (Pvt) Ltd", "z": "NASTP Sierra Karachi", "c": "FinTech"}, {"t": "ZE", "l": "01-10001-105", "n": "Winged Innovation Solutions (Pvt) Ltd", "z": "Khanpur Industrial Project, Haripur", "c": "Robotics & Artificial Intelligence"}, {"t": "ZE", "l": "01-10030-105", "n": "Winston Technologies (Pvt) Ltd", "z": "Winston Technology Zone, Islamabad", "c": "IT & ITeS"}, {"t": "ZE", "l": "01-C-10001-103", "n": "Zariea (Pvt) Ltd", "z": "PAF-IAST, Haripur", "c": "E-Commerce"}, {"t": "ZD", "l": "02-10000-102", "n": "Bahria Science & Technology Solutions (Pvt) Ltd", "z": "Pakistan Maritime Science & Technology Park", "c": ""}, {"t": "ZD", "l": "02-10000-103", "n": "Aviation City Pakistan (Pvt) ltd", "z": "NASTP Alpha", "c": ""}, {"t": "ZD", "l": "02-10001-103", "n": "Code STP Pvt Ltd", "z": "Mark software", "c": ""}, {"t": "ZD", "l": "02-10000-101", "n": "KPITB", "z": "Pakistan Digital City", "c": ""}, {"t": "ZD", "l": "02-10001-102", "n": "NRTC", "z": "NRTC Special Technology Zone", "c": ""}, {"t": "ZD", "l": "02-10002-102", "n": "National University of Sciences & Technology", "z": "NUST Special Technology Zone", "c": ""}, {"t": "ZD", "l": "02-10003-102", "n": "Mindbridge (Private) Limited", "z": "Mindbridge Special Technology Zone", "c": ""}, {"t": "ZD", "l": "02-10000-104", "n": "Tech7 (Private) Limited", "z": "Tech7 Special Technology Zone", "c": ""}, {"t": "ZD", "l": "02-10001-104", "n": "Harobanx Industries (Private) Limited", "z": "Khanpur Industrial Project", "c": ""}, {"t": "ZD", "l": "02-10002-104", "n": "Laser & Electronic Optical Solutions (Pvt) ltd", "z": "LEOS technology Zone", "c": ""}, {"t": "ZD", "l": "02-10003-104", "n": "The Winston (Pvt) Ltd", "z": "Winston Technology Zone", "c": ""}, {"t": "ZD", "l": "02-10002-103", "n": "FDH Technology Park (Pvt) Ltd", "z": "Capital Smart Technology Zone (Silicon Village)", "c": ""}, {"t": "ZD", "l": "02-10004-104", "n": "Qarshi Knowledge Park (Pvt) Ltd", "z": "Qarshi Knowledge Park", "c": ""}, {"t": "ZD", "l": "02-10005-104", "n": "Latitude Nx", "z": "Optima Technology Zone", "c": ""}, {"t": "ZD", "l": "02-10003-103", "n": "Aviation City Pakistan (Pvt) ltd", "z": "NASTP Silicon (Sierra)", "c": ""}, {"t": "ZD", "l": "02-10006-104", "n": "PCBDDA", "z": "NSIT (Silicon Block)", "c": ""}, {"t": "ZD", "l": "02-10000-105", "n": "Mega Motors Company (Pvt) Ltd", "z": "BYD NEV Production Zone", "c": ""}, {"t": "ZD", "l": "02-10007-104", "n": "Pixel Park (Pvt) Ltd", "z": "Pixel Park", "c": ""}, {"t": "ZD", "l": "02-10004-103", "n": "Aviation City Pakistan (Pvt) ltd", "z": "NASTP Delta", "c": ""}, {"t": "ZD", "l": "02-10005-103", "n": "Aviation City Pakistan (Pvt) ltd", "z": "NASTP Kamra", "c": ""}, {"t": "ZD", "l": "02-10001-105", "n": "Sapphire Electronics (Pvt) Ltd", "z": "Sapphire Production Zone", "c": ""}, {"t": "ZD", "l": "02-10002-105", "n": "Pakistan Software Export Board (Guarantee) Limited - ISBD", "z": "IT Park Islamabad", "c": ""}, {"t": "ZD", "l": "02-10003-105", "n": "Pakistan Software Export Board (Guarantee) Limited - KRCH", "z": "IT Park Karachi", "c": ""}, {"t": "ZD", "l": "02-10008-104", "n": "Project Implementation Unit, Education City", "z": "Education City STZ", "c": ""}, {"t": "ZD", "l": "02-10009-104", "n": "Innovista (Pvt) Ltd", "z": "Innovista Rawal Technology Zone", "c": ""}, {"t": "ZD", "l": "02-00010-104", "n": "Aviation City Pakistan (Pvt) ltd", "z": "NASTP Silicon Valley", "c": ""}, {"t": "ZD", "l": "02-10011-105", "n": "Systems Holdings (Pvt) Ltd", "z": "Systems Limited", "c": ""}, {"t": "ZD", "l": "02-10012-105", "n": "FonGreen Silicon Technologies Limited", "z": "Foundation Renewable & Technologies Zone (FRTZ)", "c": ""}];
+const SECTIONS = [
+ {t:"Premises and operations", items:[
+  ["V1","Licensee is physically operating from its allocated premises in the Zone","2.1(b)(ii)","Major"],
+  ["V2","Only the approved business / licensed category is being carried out","2.1(b)(ii)","Major"],
+  ["V3","No unauthorized sub-leasing or sharing of allocated space","2.1(b)(i)","Major"],
+  ["V4","Headcount and activity on site are consistent with what was reported","2.1(b)(iii)","Major"]]},
+ {t:"Incentives and exempted assets", items:[
+  ["V5","Duty-free / exempted imported machinery and equipment are present and in use as declared","2.1(b)(iii)","Major"],
+  ["V6","No unauthorized sale, transfer, or disposal of tax/duty-exempted assets","2.1(b)(iii)","Major"],
+  ["V7","Tax and duty exemption utilization records are maintained and available","2.1(b)(iv)","Major"],
+  ["V8","No indication of exemption or incentive misuse","2.1(b)(iii)","Major"]]},
+ {t:"Records and documentation", items:[
+  ["V9","Accounts and records of incentivized vs non-incentivized activity are kept separately","2.1(b)(iv)","Major"],
+  ["V10","Records requested were produced within 5 business days (Reg 10(2))","1.1(b)","Minor"],
+  ["V11","License-related documentation and registers are maintained on site","1.1(b)","Minor"]]},
+ {t:"Follow-up", items:[
+  ["V12","Findings from the previous visit or report review have been remedied","2.1(b)(v)","Major"]]}
+];
+const ITEMS = SECTIONS.flatMap(s=>s.items);
+const ITEM = Object.fromEntries(ITEMS.map(i=>[i[0],{id:i[0],text:i[1],code:i[2],cls:i[3]}]));
+const FINE = {ZE:{Minor:"up to PKR 500,000",Major:"up to PKR 5,000,000 and/or suspension or cancellation"},
+              ZD:{Minor:"up to PKR 1,000,000",Major:"up to PKR 10,000,000 and/or suspension or cancellation"}};
+const byLic = Object.fromEntries(LICENSEES.map(l=>[l.l,l]));
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+let state = {type:"ZE", answers:{}, notes:{}, editId:null};
+let visits = [];       // {id, ...data}
+let store = null;      // {save, remove, mode}
+
+/* ---------- storage ---------- */
+// Paste your Google Apps Script web app URL between the quotes (see setup guide).
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxvS4fynX-u3g7d3TM1_rzrRwxVfF21e_0T9wr0wq9uFyyvD-LMb6xckItXOqK3NTBxVg/exec";
+const useSheet = /^https:\/\/script\.google\.com\//.test(SHEET_URL);
+
+function localStore(){
+  const K="stza-field-visits";
+  const read=()=>{try{return JSON.parse(localStorage.getItem(K)||"[]")}catch(e){return []}};
+  const write=a=>{try{localStorage.setItem(K,JSON.stringify(a));return true}catch(e){return false}};
+  visits=read();
+  return {mode:"local",
+    async save(id,data){const a=read();const i=a.findIndex(v=>v.id===id);const rec={id:id||("v"+Date.now().toString(36)),...data};
+      if(i>=0)a[i]=rec;else a.push(rec); if(!write(a)) throw new Error("storage"); visits=a; renderAll(); return rec.id;},
+    async remove(id){const a=read().filter(v=>v.id!==id);write(a);visits=a;renderAll();}};
+}
+function sheetStore(){
+  async function post(body){
+    // text/plain avoids a CORS preflight, which Apps Script does not answer
+    const r=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});
+    const j=await r.json(); if(!j.ok) throw new Error(j.error||"save"); return j;
+  }
+  return {mode:"sheet",
+    async load(){ const r=await fetch(SHEET_URL+"?t="+Date.now()); const j=await r.json(); if(!j.ok) throw new Error(j.error||"load");
+      visits=j.visits||[]; renderAll(); },
+    async save(id,data){ const newId=id||("v"+Date.now().toString(36)+Math.random().toString(36).slice(2,6));
+      await post({action:"save",id:newId,data}); await this.load(); return newId; },
+    async remove(id){ await post({action:"delete",id}); await this.load(); }};
+}
+function setStoreLabel(msg){
+  $("#storeState").textContent = msg || (store.mode==="sheet" ? "Saved to the shared Google Sheet" : "Saved on this device only (no sheet connected)");
+}
+async function refresh(){
+  if(store.mode!=="sheet") return;
+  try{ await store.load(); setStoreLabel(); }catch(e){ setStoreLabel("Can't reach the sheet. Check your connection."); }
+}
+if(useSheet){ store=sheetStore(); setStoreLabel("Loading visits…"); refresh(); setInterval(refresh,60000); }
+else { store=localStore(); setStoreLabel(); }
+$("#btnCsv").hidden=false;
+
+/* ---------- evaluation ---------- */
+function evaluate(answers){
+  let c=0,nc=0,na=0,blank=0,minor=0,major=0,breached=[];
+  for(const it of ITEMS){
+    const a=answers[it[0]];
+    if(a==="C")c++; else if(a==="NA")na++; else if(a==="NC"){nc++; if(it[3]==="Major")major++; else minor++; breached.push(it[0]);} else blank++;
+  }
+  const applicable=c+nc;
+  const pct = applicable? Math.round(c/applicable*100) : null;
+  let key,label;
+  if(major){key="major";label="Major contravention";}
+  else if(minor){key="minor";label="Minor contravention";}
+  else if(blank){key="inc";label= blank===ITEMS.length?"Not started":"Incomplete";}
+  else {key="ok";label="No contravention";}
+  return {c,nc,na,blank,minor,major,breached,pct,key,label};
+}
+
+/* ---------- new visit form ---------- */
+function fillDatalist(){
+  $("#licList").innerHTML = LICENSEES.filter(l=>l.t===state.type)
+    .map(l=>`<option value="${esc(l.n)} (${esc(l.l)})"></option>`).join("");
+}
+function currentLic(){
+  const v=$("#licInput").value.trim(); const m=v.match(/\(([^()]+)\)\s*$/);
+  const key = m? m[1] : v;
+  return byLic[key] || LICENSEES.find(l=>l.n.toLowerCase()===v.toLowerCase()) || null;
+}
+function showLicInfo(){
+  const l=currentLic();
+  $("#licInfo").innerHTML = l ? `<b>${esc(l.n)}</b>, license ${esc(l.l)}${l.z?", "+esc(l.z):""}${l.c?", "+esc(l.c):""}` :
+    ($("#licInput").value.trim()? "No match in the license tracker. Pick a name from the list." : "");
+  if(l && l.t!==state.type) setType(l.t,true);
+  renderVerdict();
+}
+function renderChecklist(){
+  $("#checklist").innerHTML = SECTIONS.map(s=>`
+   <h2>${esc(s.t)}</h2>
+   <div class="checklist">${s.items.map(([id,txt,code,cls])=>{
+     const a=state.answers[id];
+     return `<div class="item ${a==="NC"?"nc":""}" data-id="${id}">
+       <div class="id">${id}</div>
+       <div><div class="txt">${esc(txt)}</div><div class="meta"><span class="cls ${cls}">${cls}</span>Schedule B ${esc(code)}</div></div>
+       <div class="seg ans" role="group" aria-label="${id} result">
+         ${[["C","Compliant"],["NC","Non-compliant"],["NA","N/A"]].map(([v,l])=>`<button data-v="${v}" aria-pressed="${a===v}">${l}</button>`).join("")}
+       </div>
+       ${a==="NC"?`<div class="note"><textarea placeholder="What was found (evidence, asset, location)" data-note="${id}">${esc(state.notes[id]||"")}</textarea></div>`:""}
+     </div>`}).join("")}</div>`).join("");
+}
+let lastKey=null;
+function renderVerdict(){
+  const e=evaluate(state.answers); const l=currentLic(); const t=l?l.t:state.type;
+  const st=$("#stamp"); st.className="stamp "+e.key; st.textContent=e.label;
+  if(lastKey!==null && lastKey!==e.key && (e.key==="major"||e.key==="minor"||e.key==="ok")){ st.classList.add("pop"); }
+  lastKey=e.key;
+  let txt;
+  if(e.key==="major"||e.key==="minor"){
+    const cls = e.key==="major"?"Major":"Minor";
+    txt = `<b>${e.nc} non-compliant</b> (${e.major} Major, ${e.minor} Minor): ${e.breached.join(", ")}. ${t} penalty ${FINE[t][cls]}.`
+      + (e.blank? ` ${e.blank} item(s) still unmarked.`:"");
+  } else if(e.key==="ok"){ txt=`All ${e.c} applicable items compliant${e.na?`, ${e.na} N/A`:""}.`; }
+  else txt = e.blank===ITEMS.length? "Mark each item Compliant, Non-compliant or N/A." : `${e.blank} of ${ITEMS.length} items still to mark.`;
+  $("#vtext").innerHTML=txt;
+}
+function setType(t,keepInput){
+  state.type=t;
+  document.querySelectorAll("[data-type]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.type===t));
+  fillDatalist();
+  if(!keepInput){ $("#licInput").value=""; $("#licInfo").textContent=""; }
+}
+document.querySelectorAll("[data-type]").forEach(b=>b.onclick=()=>setType(b.dataset.type));
+$("#licInput").addEventListener("input",showLicInfo);
+$("#checklist").addEventListener("click",ev=>{
+  const b=ev.target.closest(".ans button"); if(!b) return;
+  const id=b.closest(".item").dataset.id; const v=b.dataset.v;
+  state.answers[id] = state.answers[id]===v? undefined : v;
+  renderChecklist(); renderVerdict();
+  if(v==="NC" && state.answers[id]==="NC"){ const ta=document.querySelector(`[data-note="${id}"]`); ta&&ta.focus({preventScroll:true}); }
+});
+$("#checklist").addEventListener("input",ev=>{ const n=ev.target.dataset.note; if(n) state.notes[n]=ev.target.value; });
+
+function resetForm(){
+  state={type:state.type,answers:{},notes:{},editId:null}; lastKey=null;
+  $("#licInput").value=""; $("#licInfo").textContent=""; $("#vOfficer").value=""; $("#vObs").value="";
+  $("#vAction").value="None required"; $("#vCure").value=""; $("#vDate").value=new Date().toISOString().slice(0,10);
+  $("#editBadge").hidden=true; $("#btnSave").textContent="Save visit"; $("#btnDel")?.remove();
+  renderChecklist(); renderVerdict();
+}
+$("#btnReset").onclick=resetForm;
+
+$("#btnSave").onclick=async()=>{
+  const l=currentLic();
+  if(!l){ toast("Choose a licensee from the list first."); $("#licInput").focus(); return; }
+  if(!$("#vDate").value){ toast("Enter the visit date."); $("#vDate").focus(); return; }
+  const e=evaluate(state.answers);
+  if(e.blank===ITEMS.length){ toast("Mark at least one checklist item."); return; }
+  const answers={},notes={};
+  for(const it of ITEMS){ if(state.answers[it[0]]) answers[it[0]]=state.answers[it[0]]; if(state.answers[it[0]]==="NC" && state.notes[it[0]]) notes[it[0]]=state.notes[it[0]]; }
+  const prev = state.editId ? visits.find(v=>v.id===state.editId) : null;
+  const data={licType:l.t,licenseNo:l.l,name:l.n,zone:l.z,date:$("#vDate").value,officer:$("#vOfficer").value.trim(),
+    action:$("#vAction").value,cureDeadline:$("#vCure").value||"",observations:$("#vObs").value.trim(),
+    answers,notes,result:e.label,minorNC:e.minor,majorNC:e.major,breached:e.breached,
+    createdAt: prev?.createdAt || new Date().toISOString(), updatedAt:new Date().toISOString()};
+  $("#btnSave").disabled=true;
+  try{ await store.save(state.editId,data); toast(state.editId?"Visit updated":"Visit saved"); resetForm(); }
+  catch(err){ toast(err&&err.code==="quota_exceeded"?"The register is full. Delete old visits to add more.":"Couldn't save. Check your connection and try again."); }
+  finally{ $("#btnSave").disabled=false; }
+};
+
+function openVisit(id){
+  const v=visits.find(x=>x.id===id); if(!v) return;
+  setType(v.licType,true);
+  state.answers={...(v.answers||{})}; state.notes={...(v.notes||{})}; state.editId=id; lastKey=null;
+  $("#licInput").value=`${v.name} (${v.licenseNo})`; $("#vDate").value=v.date||""; $("#vOfficer").value=v.officer||"";
+  $("#vAction").value=v.action||"None required"; $("#vCure").value=v.cureDeadline||""; $("#vObs").value=v.observations||"";
+  $("#editBadge").hidden=false; $("#btnSave").textContent="Update visit";
+  if(!$("#btnDel")){ const d=document.createElement("button"); d.id="btnDel"; d.className="btn danger"; d.textContent="Delete visit";
+    d.onclick=async()=>{ if(!confirm("Delete this visit from the register? This can't be undone.")) return;
+      try{ await store.remove(state.editId); toast("Visit deleted"); resetForm(); }catch(e){ toast("Couldn't delete. Try again."); } };
+    $("#btnReset").before(d); }
+  renderChecklist(); showLicInfo(); switchTab("new"); window.scrollTo({top:0});
+}
+
+/* ---------- visits list ---------- */
+const pillKey = r => r==="Major contravention"?"major":r==="Minor contravention"?"minor":r==="No contravention"?"ok":"inc";
+const fmt = d => d? new Date(d+"T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "";
+function renderVisits(){
+  const q=$("#vSearch").value.trim().toLowerCase();
+  const rows=[...visits].sort((a,b)=>(b.date||"").localeCompare(a.date||""))
+    .filter(v=>!q || [v.name,v.licenseNo,v.zone,v.officer].join(" ").toLowerCase().includes(q));
+  $("#visitRows").innerHTML = rows.length? rows.map(v=>`<tr class="click" data-open="${esc(v.id)}" tabindex="0">
+     <td>${fmt(v.date)}</td><td><b>${esc(v.name)}</b><div class="muted">${esc(v.licenseNo)}</div></td><td>${esc(v.licType)}</td>
+     <td><span class="pill ${pillKey(v.result)}">${esc(v.result)}</span></td>
+     <td>${(v.breached||[]).map(id=>`${id} <span class="muted">${esc(ITEM[id]?.code||"")}</span>`).join("<br>")||"—"}</td>
+     <td>${esc(v.action||"")}${v.cureDeadline?`<div class="muted">Cure by ${fmt(v.cureDeadline)}</div>`:""}</td>
+     <td>${esc(v.officer||"")}</td></tr>`).join("")
+   : `<tr><td colspan="7" class="empty">${visits.length?"No visits match your search.":"No visits recorded yet. Start one from the New visit tab."}</td></tr>`;
+}
+$("#vSearch").addEventListener("input",renderVisits);
+$("#visitRows").addEventListener("click",e=>{const r=e.target.closest("[data-open]"); r&&openVisit(r.dataset.open);});
+$("#visitRows").addEventListener("keydown",e=>{ if(e.key==="Enter"){const r=e.target.closest("[data-open]"); r&&openVisit(r.dataset.open);} });
+
+/* ---------- scoreboard ---------- */
+let boardF="ALL";
+function licSummary(){
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-365); const cut=cutoff.toISOString().slice(0,10);
+  const map={};
+  for(const l of LICENSEES) map[l.l]={...l,visits:0,minor:0,major:0,c:0,app:0,last:null};
+  for(const v of visits){
+    const s=map[v.licenseNo]; if(!s) continue;
+    if(!s.last || (v.date||"")>(s.last.date||"")) s.last=v;
+    if((v.date||"")>=cut){ s.visits++; s.minor+=v.minorNC||0; s.major+=v.majorNC||0;
+      const e=evaluate(v.answers||{}); s.c+=e.c; s.app+=e.c+e.nc; }
+  }
+  for(const s of Object.values(map)){
+    s.pct = s.app? Math.round(s.c/s.app*100):null;
+    if(!s.visits){ s.st="grey"; s.stl= s.last? "Not visited in 12M":"Not visited"; }
+    else if(s.major){ s.st="red"; s.stl="Red: Major contravention"; }
+    else if(s.minor>=3){ s.st="red"; s.stl="Red: 3+ Minors = Major"; }
+    else if(s.minor){ s.st="amber"; s.stl="Amber: Minor contravention"; }
+    else { s.st="green"; s.stl="Green: no contravention"; }
+  }
+  return Object.values(map);
+}
+function renderBoard(){
+  const all=licSummary(); const scope=all.filter(s=>boardF==="ALL"||s.t===boardF);
+  const cnt=k=>scope.filter(s=>s.st===k).length;
+  $("#kpis").innerHTML=[["",scope.length,"Licensees"],["red",cnt("red"),"Red"],["amber",cnt("amber"),"Amber"],["green",cnt("green"),"Green"],["grey",cnt("grey"),"Not visited (12M)"]]
+    .map(([c,n,l])=>`<div class="kpi ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+  const order={red:0,amber:1,green:2,grey:3};
+  const rows=scope.filter(s=>$("#showUnvisited").checked || s.last)
+    .sort((a,b)=>order[a.st]-order[b.st] || (b.major-a.major) || (b.minor-a.minor) || a.n.localeCompare(b.n));
+  $("#boardRows").innerHTML = rows.length? rows.map(s=>`<tr>
+    <td><b>${esc(s.n)}</b><div class="muted">${esc(s.l)}</div></td><td>${s.t}</td><td>${esc(s.z)}</td>
+    <td>${s.last?fmt(s.last.date):"—"}</td>
+    <td>${s.last?`<span class="pill ${pillKey(s.last.result)}">${esc(s.last.result)}</span>`:"—"}</td>
+    <td>${s.visits}</td><td>${s.minor}</td><td>${s.major}</td><td>${s.pct===null?"—":s.pct+"%"}</td>
+    <td><span class="pill ${s.st}">${esc(s.stl)}</span></td></tr>`).join("")
+   : `<tr><td colspan="10" class="empty">No visits recorded yet. Once visits are saved, each licensee's standing appears here.</td></tr>`;
+}
+document.querySelectorAll("#boardType button").forEach(b=>b.onclick=()=>{boardF=b.dataset.f;
+  document.querySelectorAll("#boardType button").forEach(x=>x.setAttribute("aria-pressed",x===b)); renderBoard();});
+$("#showUnvisited").onchange=renderBoard;
+
+/* ---------- CSV ---------- */
+$("#btnCsv").onclick=async()=>{
+  const head=["Visit date","Type","License No","Licensee","Zone","Visited by","Result","Minor NCs","Major NCs","Breached items","Action","Cure deadline",...ITEMS.map(i=>i[0]),"Notes","Observations"];
+  const q=s=>`"${String(s??"").replace(/"/g,'""')}"`;
+  const lines=[head.map(q).join(",")].concat([...visits].sort((a,b)=>(a.date||"").localeCompare(b.date||"")).map(v=>[
+    v.date,v.licType,v.licenseNo,v.name,v.zone,v.officer,v.result,v.minorNC,v.majorNC,(v.breached||[]).map(id=>`${id} ${ITEM[id]?.code||""}`).join("; "),v.action,v.cureDeadline,
+    ...ITEMS.map(i=>({C:"Compliant",NC:"Non-compliant",NA:"N/A"}[v.answers?.[i[0]]]||"")),
+    Object.entries(v.notes||{}).map(([k,t])=>`${k}: ${t}`).join(" | "),v.observations].map(q).join(",")));
+  const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download=`field-visits-${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1000);
+};
+
+/* ---------- tabs & misc ---------- */
+function switchTab(t){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+  ["new","visits","board"].forEach(k=>$("#p-"+k).hidden = k!==t);
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{switchTab(b.dataset.tab); if(b.dataset.tab!=="new") refresh();});
+let tt; function toast(m){const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),2600);}
+function renderAll(){ renderVisits(); renderBoard(); }
+
+fillDatalist(); resetForm(); renderAll();
+</script>
+</body>
+</html>
