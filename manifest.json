@@ -1,0 +1,12 @@
+{
+  "name": "STZA Site Visit",
+  "short_name": "Site Visit",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EFEFEF",
+  "theme_color": "#084236",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
